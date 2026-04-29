@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://reonrsbfjbzhebjrfeia.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Bgi_hnsKyWNXE0kHkRB6Yw__53R9bfq';
+const SUPABASE_URL = 'https://jeonqxrhsgptutufrwpo.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_m6n5JpTu5HD_2hdJR3CWAQ_0Pv5gLbx';
 const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/search`;
 
 const header = document.getElementById('header');
@@ -103,7 +103,7 @@ function renderResults(results) {
           <div class="result-images">
             ${images.map((img, idx) => `
               <div class="result-image-thumb" onclick="openLightbox(${i}, ${idx})">
-                <img src="data:image/png;base64,${img.data}" alt="Problem figure ${idx + 1}" loading="lazy">
+                <img src="data:image/${img.format || 'png'};base64,${img.data}" alt="Problem figure ${idx + 1}" loading="lazy">
                 <div class="result-image-overlay">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
                 </div>

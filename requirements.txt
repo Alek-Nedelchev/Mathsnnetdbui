@@ -1,3 +1,5 @@
 datasets
 supabase
 requests
+Pillow
+python-dotenv

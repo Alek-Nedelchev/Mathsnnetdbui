@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://reonrsbfjbzhebjrfeia.supabase.co/functions/v1/search">
+  <a href="https://jeonqxrhsgptutufrwpo.supabase.co/functions/v1/search">
     <img src="https://img.shields.io/badge/Live%20Demo-View%20Site-blue?style=for-the-badge" alt="Live Demo">
   </a>
   <img src="https://img.shields.io/badge/Dataset-28K%2B%20Problems-green?style=for-the-badge" alt="Dataset Size">
@@ -24,61 +24,55 @@
 
 ## Overview
 
-VecSRCH is a semantic search engine for competitive mathematics. It powers fast, intelligent discovery of problems from the [MathNet dataset](https://huggingface.co/datasets/ShadenA/MathNet) using vector embeddings and similarity search.
+VecSRCH is a semantic search engine for competitive math. It lets you find problems from the [MathNet dataset](https://huggingface.co/datasets/ShadenA/MathNet) using vector embeddings instead of just keyword matching.
 
-**Key Features**
+**What it does**
 
-- 🔍 **Semantic Search** — Find problems by concept, not just keywords
-- ⚡ **Sub-100ms queries** — Edge-deployed with global CDN
-- 🖼️ **Image Support** — Problems with diagrams are indexed and displayed
-- 🎨 **Clean UI** — Minimal, focused interface with dark mode
-- 📊 **Rich Metadata** — Filter by country, competition, topics
+- Search by concept ("geometry triangle circumcircle") not just exact words
+- Edge-deployed for fast queries anywhere
+- Shows diagrams when problems have them
+- Dark mode because obviously
+- Filter by competition, country, whatever
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
-│   Browser   │────▶│  Edge Func   │────▶│   OpenRouter    │
-│  (GitHub    │◄────│  (Supabase)  │◄────│  (Embeddings)   │
-│   Pages)    │     └──────┬───────┘     └─────────────────┘
-└─────────────┘            │
-                           ▼
-                    ┌──────────────┐
-                    │   Supabase   │
-                    │  Postgres +  │
-                    │   pgvector   │
-                    └──────────────┘
+Browser (GitHub Pages) 
+    ↓
+Edge Function (Supabase/Deno)
+    ↓
+OpenRouter (embeddings) + Postgres (pgvector)
 ```
 
-| Component | Technology |
-|-----------|------------|
-| Frontend | Static HTML/CSS/JS (GitHub Pages) |
-| API | Supabase Edge Functions (Deno) |
-| Database | PostgreSQL + pgvector extension |
-| Embeddings (Prod) | OpenRouter — `qwen/qwen3-embedding-4b` |
-| Embeddings (Build) | LM Studio — local inference |
-| Dataset | [ShadenA/MathNet](https://huggingface.co/datasets/ShadenA/MathNet) |
+| Thing | What we used |
+|-------|--------------|
+| Frontend | Static HTML/CSS/JS on GitHub Pages |
+| API | Supabase Edge Functions |
+| Database | PostgreSQL + pgvector |
+| Embeddings (live) | OpenRouter - `qwen/qwen3-embedding-4b` |
+| Embeddings (build) | LM Studio locally |
+| Dataset | [ShadenA/MathNet](https://huggingface.co/datasets/ShadenA/MathNet) (~28K problems) |
 
 ---
 
 ## Setup
 
-### Prerequisites
+### What you need
 
-- Python 3.12+
+- Python 3.12+ (3.14 breaks stuff)
 - Supabase account
 - OpenRouter API key
-- LM Studio (for database population)
+- LM Studio for building the database
 
-### 1. Install dependencies
+### 1. Install stuff
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Populate the database
+### 2. Build the database
 
 Start LM Studio with `text-embedding-qwen3-embedding-4b` loaded, then:
 
@@ -86,21 +80,15 @@ Start LM Studio with `text-embedding-qwen3-embedding-4b` loaded, then:
 python build_db.py
 ```
 
-Enter your Supabase `service_role` key when prompted.
+It'll ask for your Supabase `service_role` key. Copy it from Supabase dashboard.
 
-### 3. Add image metadata (optional)
+### 3. Set Edge Function secrets
 
-```bash
-python update_images.py
-```
-
-### 4. Configure Edge Function secrets
-
-In Supabase Dashboard → Project Settings → Edge Functions → Secrets, add:
+In Supabase Dashboard > Project Settings > Edge Functions > Secrets, add:
 
 | Secret | Value |
 |--------|-------|
-| `OPENROUTER_API_KEY` | Your OpenRouter API key |
+| `OPENROUTER_API_KEY` | Your OpenRouter key |
 | `SUPABASE_URL` | Your project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Your service role key |
 
@@ -110,22 +98,22 @@ In Supabase Dashboard → Project Settings → Edge Functions → Secrets, add:
 
 ### GitHub Pages
 
-1. Fork this repository
-2. Go to **Settings → Pages**
-3. Select source: `Deploy from a branch` → `main` → `/ (root)`
-4. Your site will be live at `https://<username>.github.io/VecSRCH`
+1. Fork this repo
+2. Settings > Pages
+3. Source: `main` branch, root folder
+4. Site goes live at `https://<username>.github.io/VecSRCH`
 
-### Custom Domain (optional)
+### Custom domain
 
-Add a `CNAME` file to the repo root with your domain.
+Add a `CNAME` file with your domain if you want.
 
 ---
 
-## API Reference
+## API
 
 ### POST `/functions/v1/search`
 
-Search for math problems by semantic similarity.
+Search problems by semantic similarity.
 
 **Request**
 
@@ -155,24 +143,24 @@ Search for math problems by semantic similarity.
 }
 ```
 
-**Rate Limits:** 20 requests/minute per IP
+**Rate limit:** 20 req/min per IP (hard limit in Edge Function).
 
 ---
 
 ## Dataset
 
-The [MathNet dataset](https://huggingface.co/datasets/ShadenA/MathNet) contains:
+[MathNet](https://huggingface.co/datasets/ShadenA/MathNet) has:
 
-- **28,385** competition math problems
-- **4,000+** with accompanying figures
-- **Multiple** competition sources (IMO, AIME, USAMO, etc.)
-- **Multi-language** support (EN, RU, CN, etc.)
+- 28,385 competition math problems
+- 4,000+ with figures/diagrams
+- Various sources (IMO, AIME, USAMO, etc.)
+- Multiple languages
 
 ---
 
 ## License
 
-MIT — see [LICENSE](./LICENSE) for details.
+MIT. See [LICENSE](./LICENSE).
 
 ---
 
