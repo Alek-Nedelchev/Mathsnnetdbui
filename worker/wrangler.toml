@@ -1,0 +1,9 @@
+name = "moqsearch"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Secrets to set via wrangler secret put:
+#   OPENROUTER_API_KEY - Your OpenRouter API key for embeddings
+#   QDRANT_URL - Your Qdrant instance URL (e.g., https://your-cluster.qdrant.io)
+#   QDRANT_API_KEY - Your Qdrant API key
+#   QDRANT_COLLECTION - Collection name

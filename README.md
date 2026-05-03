@@ -1,169 +1,177 @@
-# VecSRCH
+# Supabase CLI
 
-<p align="center">
-  <strong>Vector search for 28,000+ Olympiad math problems</strong>
-</p>
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=develop)](https://coveralls.io/github/supabase/cli?branch=develop) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-<p align="center">
-  <a href="https://jeonqxrhsgptutufrwpo.supabase.co/functions/v1/search">
-    <img src="https://img.shields.io/badge/Live%20Demo-View%20Site-blue?style=for-the-badge" alt="Live Demo">
-  </a>
-  <img src="https://img.shields.io/badge/Dataset-28K%2B%20Problems-green?style=for-the-badge" alt="Dataset Size">
-  <img src="https://img.shields.io/badge/Embeddings-Qwen3--4B-purple?style=for-the-badge" alt="Embeddings">
-</p>
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-<p align="center">
-  <a href="#overview">Overview</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#setup">Setup</a> •
-  <a href="#deployment">Deployment</a> •
-  <a href="#license">License</a>
-</p>
+This repository contains all the functionality for Supabase CLI.
 
----
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-## Overview
+## Getting started
 
-VecSRCH is a semantic search engine for competitive math. It lets you find problems from the [MathNet dataset](https://huggingface.co/datasets/ShadenA/MathNet) using vector embeddings instead of just keyword matching.
+### Install the CLI
 
-**What it does**
-
-- Search by concept ("geometry triangle circumcircle") not just exact words
-- Edge-deployed for fast queries anywhere
-- Shows diagrams when problems have them
-- Dark mode because obviously
-- Filter by competition, country, whatever
-
----
-
-## Architecture
-
-```
-Browser (GitHub Pages) 
-    ↓
-Edge Function (Supabase/Deno)
-    ↓
-OpenRouter (embeddings) + Postgres (pgvector)
-```
-
-| Thing | What we used |
-|-------|--------------|
-| Frontend | Static HTML/CSS/JS on GitHub Pages |
-| API | Supabase Edge Functions |
-| Database | PostgreSQL + pgvector |
-| Embeddings (live) | OpenRouter - `qwen/qwen3-embedding-4b` |
-| Embeddings (build) | LM Studio locally |
-| Dataset | [ShadenA/MathNet](https://huggingface.co/datasets/ShadenA/MathNet) (~28K problems) |
-
----
-
-## Setup
-
-### What you need
-
-- Python 3.12+ (3.14 breaks stuff)
-- Supabase account
-- OpenRouter API key
-- LM Studio for building the database
-
-### 1. Install stuff
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
 ```bash
-pip install -r requirements.txt
+npm i supabase --save-dev
 ```
 
-### 2. Build the database
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
 
-Start LM Studio with `text-embedding-qwen3-embedding-4b` loaded, then:
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
+```
+
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
+
+<details>
+  <summary><b>macOS</b></summary>
+
+  Available via [Homebrew](https://brew.sh). To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
 
 ```bash
-python build_db.py
+supabase bootstrap
 ```
 
-It'll ask for your Supabase `service_role` key. Copy it from Supabase dashboard.
+Or using npx:
 
-### 3. Set Edge Function secrets
-
-In Supabase Dashboard > Project Settings > Edge Functions > Secrets, add:
-
-| Secret | Value |
-|--------|-------|
-| `OPENROUTER_API_KEY` | Your OpenRouter key |
-| `SUPABASE_URL` | Your project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key |
-
----
-
-## Deployment
-
-### GitHub Pages
-
-1. Fork this repo
-2. Settings > Pages
-3. Source: `main` branch, root folder
-4. Site goes live at `https://<username>.github.io/VecSRCH`
-
-### Custom domain
-
-Add a `CNAME` file with your domain if you want.
-
----
-
-## API
-
-### POST `/functions/v1/search`
-
-Search problems by semantic similarity.
-
-**Request**
-
-```json
-{
-  "query": "geometry triangle circumcircle",
-  "count": 10
-}
+```bash
+npx supabase bootstrap
 ```
 
-**Response**
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-```json
-{
-  "results": [
-    {
-      "id": "mathnet_1234",
-      "problem_markdown": "...",
-      "similarity": 0.87,
-      "country": "USA",
-      "competition": "IMO",
-      "topics_flat": ["geometry", "circles"],
-      "has_images": true,
-      "num_images": 2
-    }
-  ]
-}
+## Docs
+
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
+
+## Breaking changes
+
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
+
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
+
+## Developing
+
+To run from source:
+
+```sh
+# Go >= 1.22
+go run . help
 ```
-
-**Rate limit:** 20 req/min per IP (hard limit in Edge Function).
-
----
-
-## Dataset
-
-[MathNet](https://huggingface.co/datasets/ShadenA/MathNet) has:
-
-- 28,385 competition math problems
-- 4,000+ with figures/diagrams
-- Various sources (IMO, AIME, USAMO, etc.)
-- Multiple languages
-
----
-
-## License
-
-MIT. See [LICENSE](./LICENSE).
-
----
-
-<p align="center">
-  Built by <a href="https://github.com/Alek-Nedelchev">Aleksandar Nedelchev</a> & <a href="https://github.com/Richard-Zzzzz">Richard Zhang</a>
-</p>

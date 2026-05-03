@@ -7,3 +7,5 @@ node_modules/
 .DS_Store
 *.log
 *.sqlite3
+chroma_data/
+worker_data/

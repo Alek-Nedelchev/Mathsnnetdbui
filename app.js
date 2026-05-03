@@ -1,6 +1,4 @@
-const SUPABASE_URL = 'https://jeonqxrhsgptutufrwpo.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_m6n5JpTu5HD_2hdJR3CWAQ_0Pv5gLbx';
-const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/search`;
+const WORKER_URL = ''; // Set your Cloudflare Worker URL here
 
 const header = document.getElementById('header');
 
@@ -25,23 +23,20 @@ searchForm.addEventListener('submit', async (e) => {
 
   resultsEl.classList.add('hidden');
   resultsEl.innerHTML = '';
+
+  if (!WORKER_URL) {
+    showStatus('Set WORKER_URL in app.js to your Cloudflare Worker', true);
+    return;
+  }
+
   showStatus('Searching...');
 
   try {
-    const res = await fetch(EDGE_FUNCTION_URL, {
+    const res = await fetch(`${WORKER_URL}/search`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
-        'apikey': SUPABASE_PUBLISHABLE_KEY,
-      },
-      body: JSON.stringify({ query, count: 10 }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, count: 10, threshold: 0.5 }),
     });
-
-    if (res.status === 429) {
-      showStatus('Rate limit exceeded. Please wait a minute and try again.', true);
-      return;
-    }
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -59,7 +54,7 @@ searchForm.addEventListener('submit', async (e) => {
 
     renderResults(data.results);
   } catch (err) {
-    showStatus('Network error. Please try again.', true);
+    showStatus(err.message || 'Network error', true);
   }
 });
 
@@ -80,7 +75,7 @@ function renderResults(results) {
   resultsEl.innerHTML = results.map((r, i) => {
     const similarity = (r.similarity * 100).toFixed(1);
     const topics = Array.isArray(r.topics_flat) ? r.topics_flat : [];
-    const problemPreview = escapeHtml(r.problem_markdown || '');
+    const problemPreview = escapeHtml(r.document || '');
     const needsExpand = problemPreview.length > 500;
     const images = parseImages(r.images_data);
     const hasImages = images.length > 0 || r.has_images;

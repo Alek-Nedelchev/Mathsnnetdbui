@@ -1,5 +1,5 @@
-datasets
-supabase
-requests
-Pillow
+chromadb
+qdrant-client
 python-dotenv
+openai
+datasets
